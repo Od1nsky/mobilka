@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/pacificapp/burnout-prevention/pkg/proto/user";
+
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+
+// Пользователь
+message User {
+  int64 id = 1;
+  string username = 2;
+  string email = 3;
+  string first_name = 4;
+  string last_name = 5;
+  google.protobuf.Timestamp date_joined = 6;
+  google.protobuf.Timestamp last_login = 7;
+  string date_of_birth = 8; // YYYY-MM-DD
+  string avatar_url = 9;
+  int32 stress_level_base = 10;
+  double sleep_hours_avg = 11;
+  double work_hours_daily = 12;
+  bool notifications_enabled = 13;
+  int32 notification_frequency = 14;
+}
+
+// Запрос на регистрацию
+message RegisterRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string date_of_birth = 6; // YYYY-MM-DD
+}
+
+message RegisterResponse {
+  User user = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+}
+
+// Запрос на вход
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  User user = 3;
+}
+
+// Обновление токена
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+// Получение текущего пользователя
+message GetCurrentUserRequest {}
+
+message GetCurrentUserResponse {
+  User user = 1;
+}
+
+// Обновление профиля
+message UpdateProfileRequest {
+  string first_name = 1;
+  string last_name = 2;
+  string date_of_birth = 3; // YYYY-MM-DD
+  int32 stress_level_base = 4;
+  double sleep_hours_avg = 5;
+  double work_hours_daily = 6;
+  bool notifications_enabled = 7;
+  int32 notification_frequency = 8;
+}
+
+message UpdateProfileResponse {
+  User user = 1;
+}
+
+// Изменение пароля
+message ChangePasswordRequest {
+  string current_password = 1;
+  string new_password = 2;
+}
+
+message ChangePasswordResponse {
+  bool success = 1;
+}
+
+// Загрузка аватара
+message UploadAvatarRequest {
+  bytes avatar_data = 1;
+  string content_type = 2;
+}
+
+message UploadAvatarResponse {
+  User user = 1;
+}
+
+// Получение списка пользователей
+message ListUsersRequest {
+  common.PaginationRequest pagination = 1;
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+  common.PaginationResponse pagination = 2;
+}
+
+// Получение пользователя по ID
+message GetUserRequest {
+  int64 user_id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+// Сервис пользователей
+service UserService {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc GetCurrentUser(GetCurrentUserRequest) returns (GetCurrentUserResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+  rpc UploadAvatar(UploadAvatarRequest) returns (UploadAvatarResponse);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+}
+

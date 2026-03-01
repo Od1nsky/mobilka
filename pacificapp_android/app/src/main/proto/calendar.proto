@@ -1,0 +1,157 @@
+syntax = "proto3";
+
+package calendar;
+
+option go_package = "github.com/pacificapp/burnout-prevention/pkg/proto/calendar";
+
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+
+// Тип календаря
+enum CalendarType {
+  CALENDAR_TYPE_UNSPECIFIED = 0;
+  CALENDAR_TYPE_GOOGLE = 1;
+  CALENDAR_TYPE_OUTLOOK = 2;
+}
+
+// Интеграция с календарем
+message CalendarIntegration {
+  int64 id = 1;
+  int64 user_id = 2;
+  CalendarType type = 3;
+  bool is_active = 4;
+  google.protobuf.Timestamp last_sync = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Событие календаря
+message CalendarEvent {
+  string event_id = 1;
+  string title = 2;
+  string description = 3;
+  google.protobuf.Timestamp start_time = 4;
+  google.protobuf.Timestamp end_time = 5;
+  bool is_all_day = 6;
+  string location = 7;
+  bool is_meeting = 8;
+  int32 attendees_count = 9;
+  int32 stress_score = 10; // 0-100
+}
+
+// Создание интеграции
+message CreateCalendarIntegrationRequest {
+  CalendarType type = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+  google.protobuf.Timestamp token_expiry = 4;
+}
+
+message CreateCalendarIntegrationResponse {
+  CalendarIntegration integration = 1;
+}
+
+// Получение интеграции
+message GetCalendarIntegrationRequest {
+  int64 id = 1;
+}
+
+message GetCalendarIntegrationResponse {
+  CalendarIntegration integration = 1;
+}
+
+// Список интеграций
+message ListCalendarIntegrationsRequest {
+  common.PaginationRequest pagination = 1;
+}
+
+message PaginationResponse {
+  int32 count = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+  int32 total_pages = 4;
+  bool has_next = 5;
+  bool has_previous = 6;
+}
+
+message ListCalendarIntegrationsResponse {
+  repeated CalendarIntegration integrations = 1;
+  PaginationResponse pagination = 2;
+}
+
+// Обновление интеграции
+message UpdateCalendarIntegrationRequest {
+  int64 id = 1;
+  bool is_active = 2;
+  string access_token = 3;
+  string refresh_token = 4;
+  google.protobuf.Timestamp token_expiry = 5;
+}
+
+message UpdateCalendarIntegrationResponse {
+  CalendarIntegration integration = 1;
+}
+
+// Удаление интеграции
+message DeleteCalendarIntegrationRequest {
+  int64 id = 1;
+}
+
+message DeleteCalendarIntegrationResponse {
+  bool success = 1;
+}
+
+// Получение провайдеров
+message GetCalendarProvidersRequest {}
+
+message CalendarProvider {
+  CalendarType type = 1;
+  string name = 2;
+}
+
+message GetCalendarProvidersResponse {
+  repeated CalendarProvider providers = 1;
+}
+
+// Обновление токена
+message RefreshCalendarTokenRequest {
+  int64 id = 1;
+  string refresh_token = 2;
+}
+
+message RefreshCalendarTokenResponse {
+  CalendarIntegration integration = 1;
+}
+
+// Синхронизация календаря
+message SyncCalendarRequest {
+  int64 id = 1;
+}
+
+message SyncCalendarResponse {
+  bool success = 1;
+  int32 events_synced = 2;
+}
+
+// Получение событий календаря
+message GetCalendarEventsRequest {
+  int64 id = 1;
+  common.DateRange date_range = 2;
+}
+
+message GetCalendarEventsResponse {
+  repeated CalendarEvent events = 1;
+}
+
+// Сервис календаря
+service CalendarService {
+  rpc CreateCalendarIntegration(CreateCalendarIntegrationRequest) returns (CreateCalendarIntegrationResponse);
+  rpc GetCalendarIntegration(GetCalendarIntegrationRequest) returns (GetCalendarIntegrationResponse);
+  rpc ListCalendarIntegrations(ListCalendarIntegrationsRequest) returns (ListCalendarIntegrationsResponse);
+  rpc UpdateCalendarIntegration(UpdateCalendarIntegrationRequest) returns (UpdateCalendarIntegrationResponse);
+  rpc DeleteCalendarIntegration(DeleteCalendarIntegrationRequest) returns (DeleteCalendarIntegrationResponse);
+  rpc GetCalendarProviders(GetCalendarProvidersRequest) returns (GetCalendarProvidersResponse);
+  rpc RefreshCalendarToken(RefreshCalendarTokenRequest) returns (RefreshCalendarTokenResponse);
+  rpc SyncCalendar(SyncCalendarRequest) returns (SyncCalendarResponse);
+  rpc GetCalendarEvents(GetCalendarEventsRequest) returns (GetCalendarEventsResponse);
+}

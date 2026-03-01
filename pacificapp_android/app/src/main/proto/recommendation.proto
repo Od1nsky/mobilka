@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+package recommendation;
+
+option go_package = "github.com/pacificapp/burnout-prevention/pkg/proto/recommendation";
+
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+
+// Категория рекомендации
+enum RecommendationCategory {
+  CATEGORY_UNSPECIFIED = 0;
+  CATEGORY_SLEEP = 1;
+  CATEGORY_STRESS = 2;
+  CATEGORY_WORK = 3;
+  CATEGORY_ACTIVITY = 4;
+}
+
+// Приоритет рекомендации
+enum RecommendationPriority {
+  PRIORITY_UNSPECIFIED = 0;
+  PRIORITY_HIGH = 1;
+  PRIORITY_MEDIUM = 2;
+  PRIORITY_LOW = 3;
+}
+
+// Статус пользовательской рекомендации
+enum RecommendationStatus {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_NEW = 1;
+  STATUS_IN_PROGRESS = 2;
+  STATUS_COMPLETED = 3;
+  STATUS_SKIPPED = 4;
+}
+
+// Шаблон рекомендации
+message Recommendation {
+  int64 id = 1;
+  int64 type_id = 2;
+  string title = 3;
+  string description = 4;
+  int32 duration_minutes = 5;
+  RecommendationCategory category = 6;
+  RecommendationPriority priority = 7;
+  bool is_quick = 8;
+  int32 type = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+// Пользовательская рекомендация
+message UserRecommendation {
+  string id = 1; // UUID
+  int64 user_id = 2;
+  int64 recommendation_id = 3;
+  string title = 4;
+  string description = 5;
+  RecommendationCategory category = 6;
+  RecommendationPriority priority = 7;
+  int32 duration_minutes = 8;
+  bool is_quick = 9;
+  string recommendation_type = 10;
+  RecommendationStatus status = 11;
+  string reason = 12;
+  string user_feedback = 13;
+  int32 user_rating = 14; // 1-5
+  google.protobuf.Timestamp created_at = 15;
+  google.protobuf.Timestamp completed_at = 16;
+}
+
+// Список шаблонов рекомендаций
+message ListRecommendationsRequest {
+  common.PaginationRequest pagination = 1;
+  RecommendationCategory category = 2;
+  RecommendationPriority priority = 3;
+  bool is_quick = 4;
+  int32 type = 5;
+}
+
+message ListRecommendationsResponse {
+  repeated Recommendation recommendations = 1;
+  common.PaginationResponse pagination = 2;
+}
+
+// Получение шаблона рекомендации
+message GetRecommendationRequest {
+  int64 id = 1;
+}
+
+message GetRecommendationResponse {
+  Recommendation recommendation = 1;
+}
+
+// Список пользовательских рекомендаций
+message ListUserRecommendationsRequest {
+  common.PaginationRequest pagination = 1;
+}
+
+message ListUserRecommendationsResponse {
+  repeated UserRecommendation recommendations = 1;
+  common.PaginationResponse pagination = 2;
+}
+
+// Создание пользовательской рекомендации
+message CreateUserRecommendationRequest {
+  int64 recommendation_id = 1;
+  string reason = 2;
+}
+
+message CreateUserRecommendationResponse {
+  UserRecommendation recommendation = 1;
+}
+
+// Получение пользовательской рекомендации
+message GetUserRecommendationRequest {
+  string public_id = 1; // UUID
+}
+
+message GetUserRecommendationResponse {
+  UserRecommendation recommendation = 1;
+}
+
+// Обновление пользовательской рекомендации
+message UpdateUserRecommendationRequest {
+  string public_id = 1; // UUID
+  RecommendationStatus status = 2;
+  string user_feedback = 3;
+  int32 user_rating = 4; // 1-5
+}
+
+message UpdateUserRecommendationResponse {
+  UserRecommendation recommendation = 1;
+}
+
+// Обновление статуса рекомендации
+message UpdateRecommendationStatusRequest {
+  string public_id = 1; // UUID
+  RecommendationStatus status = 2;
+}
+
+message UpdateRecommendationStatusResponse {
+  UserRecommendation recommendation = 1;
+}
+
+// Удаление пользовательской рекомендации
+message DeleteUserRecommendationRequest {
+  string public_id = 1; // UUID
+}
+
+message DeleteUserRecommendationResponse {
+  bool success = 1;
+}
+
+// Запрос новых рекомендаций
+message RequestNewRecommendationsRequest {}
+
+message RequestNewRecommendationsResponse {
+  repeated UserRecommendation recommendations = 1;
+}
+
+// Статистика по рекомендациям
+message GetRecommendationStatsRequest {}
+
+message RecommendationStats {
+  int32 total_recommendations = 1;
+  int32 new_count = 2;
+  int32 in_progress_count = 3;
+  int32 completed_count = 4;
+  int32 skipped_count = 5;
+  double average_rating = 6;
+}
+
+message GetRecommendationStatsResponse {
+  RecommendationStats stats = 1;
+}
+
+// Сервис рекомендаций
+service RecommendationService {
+  rpc ListRecommendations(ListRecommendationsRequest) returns (ListRecommendationsResponse);
+  rpc GetRecommendation(GetRecommendationRequest) returns (GetRecommendationResponse);
+  rpc ListUserRecommendations(ListUserRecommendationsRequest) returns (ListUserRecommendationsResponse);
+  rpc CreateUserRecommendation(CreateUserRecommendationRequest) returns (CreateUserRecommendationResponse);
+  rpc GetUserRecommendation(GetUserRecommendationRequest) returns (GetUserRecommendationResponse);
+  rpc UpdateUserRecommendation(UpdateUserRecommendationRequest) returns (UpdateUserRecommendationResponse);
+  rpc UpdateRecommendationStatus(UpdateRecommendationStatusRequest) returns (UpdateRecommendationStatusResponse);
+  rpc DeleteUserRecommendation(DeleteUserRecommendationRequest) returns (DeleteUserRecommendationResponse);
+  rpc RequestNewRecommendations(RequestNewRecommendationsRequest) returns (RequestNewRecommendationsResponse);
+  rpc GetRecommendationStats(GetRecommendationStatsRequest) returns (GetRecommendationStatsResponse);
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pacific_blue">#0077B6</color>
+    <color name="pacific_blue_light">#48CAE4</color>
+    <color name="pacific_blue_dark">#023E8A</color>
+    <color name="stress_low">#4CAF50</color>
+    <color name="stress_medium">#FFC107</color>
+    <color name="stress_high">#FF9800</color>
+    <color name="stress_critical">#F44336</color>
+</resources>

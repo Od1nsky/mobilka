@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package sleep;
+
+option go_package = "github.com/pacificapp/burnout-prevention/pkg/proto/sleep";
+
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+
+// Запись о сне
+message SleepRecord {
+  int64 id = 1;
+  int64 user_id = 2;
+  string date = 3; // YYYY-MM-DD
+  double duration_hours = 4;
+  int32 quality = 5; // 1-10, опционально
+  string notes = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// Создание записи о сне
+message CreateSleepRecordRequest {
+  string date = 1; // YYYY-MM-DD
+  double duration_hours = 2;
+  int32 quality = 3; // 1-10, опционально
+  string notes = 4;
+}
+
+message CreateSleepRecordResponse {
+  SleepRecord sleep_record = 1;
+}
+
+// Получение записи о сне
+message GetSleepRecordRequest {
+  int64 id = 1;
+}
+
+message GetSleepRecordResponse {
+  SleepRecord sleep_record = 1;
+}
+
+// Список записей о сне
+message ListSleepRecordsRequest {
+  common.PaginationRequest pagination = 1;
+  common.DateRange date_range = 2;
+}
+
+message ListSleepRecordsResponse {
+  repeated SleepRecord sleep_records = 1;
+  common.PaginationResponse pagination = 2;
+}
+
+// Обновление записи о сне
+message UpdateSleepRecordRequest {
+  int64 id = 1;
+  string date = 2; // YYYY-MM-DD
+  double duration_hours = 3;
+  int32 quality = 4; // 1-10, опционально
+  string notes = 5;
+}
+
+message UpdateSleepRecordResponse {
+  SleepRecord sleep_record = 1;
+}
+
+// Удаление записи о сне
+message DeleteSleepRecordRequest {
+  int64 id = 1;
+}
+
+message DeleteSleepRecordResponse {
+  bool success = 1;
+}
+
+// Статистика по сну
+message GetSleepStatisticsRequest {
+  common.DateRange date_range = 1;
+}
+
+message SleepStatistics {
+  double average_duration = 1;
+  double average_quality = 2;
+  int32 total_records = 3;
+  repeated DailySleepData daily_data = 4;
+}
+
+message DailySleepData {
+  string date = 1; // YYYY-MM-DD
+  double duration_hours = 2;
+  double quality = 3;
+}
+
+message GetSleepStatisticsResponse {
+  SleepStatistics statistics = 1;
+}
+
+// Сервис сна
+service SleepService {
+  rpc CreateSleepRecord(CreateSleepRecordRequest) returns (CreateSleepRecordResponse);
+  rpc GetSleepRecord(GetSleepRecordRequest) returns (GetSleepRecordResponse);
+  rpc ListSleepRecords(ListSleepRecordsRequest) returns (ListSleepRecordsResponse);
+  rpc UpdateSleepRecord(UpdateSleepRecordRequest) returns (UpdateSleepRecordResponse);
+  rpc DeleteSleepRecord(DeleteSleepRecordRequest) returns (DeleteSleepRecordResponse);
+  rpc GetSleepStatistics(GetSleepStatisticsRequest) returns (GetSleepStatisticsResponse);
+}

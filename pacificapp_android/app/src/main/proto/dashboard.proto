@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package dashboard;
+
+option go_package = "github.com/pacificapp/burnout-prevention/pkg/proto/dashboard";
+
+import "google/protobuf/timestamp.proto";
+
+// Сводка дашборда
+message DashboardSummary {
+  double current_stress_level = 1;
+  double average_sleep_hours = 2;
+  double average_work_hours = 3;
+  int32 burnout_risk_level = 4; // 0-100
+  int32 active_recommendations = 5;
+  int32 completed_recommendations = 6;
+  google.protobuf.Timestamp last_updated = 7;
+}
+
+// Получение сводки дашборда
+message GetDashboardSummaryRequest {}
+
+message GetDashboardSummaryResponse {
+  DashboardSummary summary = 1;
+}
+
+// Сервис дашборда
+service DashboardService {
+  rpc GetDashboardSummary(GetDashboardSummaryRequest) returns (GetDashboardSummaryResponse);
+}

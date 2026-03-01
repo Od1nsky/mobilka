@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package burnout;
+
+option go_package = "github.com/pacificapp/burnout-prevention/pkg/proto/burnout";
+
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+
+// Риск выгорания
+message BurnoutRisk {
+  int64 id = 1;
+  int64 user_id = 2;
+  string date = 3; // YYYY-MM-DD
+  int32 risk_level = 4; // 0-100
+  map<string, string> factors = 5;
+  repeated string recommendations = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// Расчет риска выгорания
+message CalculateBurnoutRiskRequest {}
+
+message CalculateBurnoutRiskResponse {
+  BurnoutRisk burnout_risk = 1;
+}
+
+// Получение данных по факторам
+message CalculateFactorDataRequest {}
+
+message FactorData {
+  string overtime_factor = 1;
+  string workday_duration_factor = 2;
+  string stress_factor = 3;
+  string sleep_quality_factor = 4;
+  string sleep_deprivation_factor = 5;
+  map<string, string> factors_data = 6;
+  repeated string recommendations = 7;
+}
+
+message CalculateFactorDataResponse {
+  FactorData factor_data = 1;
+}
+
+// История риска выгорания
+message GetBurnoutRiskHistoryRequest {}
+
+message GetBurnoutRiskHistoryResponse {
+  repeated BurnoutRisk history = 1;
+}
+
+// Последний расчет риска
+message GetLatestBurnoutRiskRequest {}
+
+message GetLatestBurnoutRiskResponse {
+  BurnoutRisk burnout_risk = 1;
+}
+
+// Недельные данные для графика
+message GetWeeklyDataRequest {}
+
+message WeeklyData {
+  repeated DailyRiskData daily_data = 1;
+}
+
+message DailyRiskData {
+  string date = 1; // YYYY-MM-DD
+  int32 risk_level = 2; // 0-100
+}
+
+message GetWeeklyDataResponse {
+  WeeklyData weekly_data = 1;
+}
+
+// Получение риска выгорания по ID
+message GetBurnoutRiskRequest {
+  int64 id = 1;
+}
+
+message GetBurnoutRiskResponse {
+  BurnoutRisk burnout_risk = 1;
+}
+
+// Список рисков выгорания
+message ListBurnoutRisksRequest {
+  common.PaginationRequest pagination = 1;
+}
+
+message PaginationResponse {
+  int32 count = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+  int32 total_pages = 4;
+  bool has_next = 5;
+  bool has_previous = 6;
+}
+
+message ListBurnoutRisksResponse {
+  repeated BurnoutRisk burnout_risks = 1;
+  PaginationResponse pagination = 2;
+}
+
+// Сервис риска выгорания
+service BurnoutRiskService {
+  rpc CalculateBurnoutRisk(CalculateBurnoutRiskRequest) returns (CalculateBurnoutRiskResponse);
+  rpc CalculateFactorData(CalculateFactorDataRequest) returns (CalculateFactorDataResponse);
+  rpc GetBurnoutRiskHistory(GetBurnoutRiskHistoryRequest) returns (GetBurnoutRiskHistoryResponse);
+  rpc GetLatestBurnoutRisk(GetLatestBurnoutRiskRequest) returns (GetLatestBurnoutRiskResponse);
+  rpc GetWeeklyData(GetWeeklyDataRequest) returns (GetWeeklyDataResponse);
+  rpc GetBurnoutRisk(GetBurnoutRiskRequest) returns (GetBurnoutRiskResponse);
+  rpc ListBurnoutRisks(ListBurnoutRisksRequest) returns (ListBurnoutRisksResponse);
+}
